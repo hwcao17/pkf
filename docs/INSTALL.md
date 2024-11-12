@@ -4,7 +4,7 @@ PKF is built upon codebase of [YOLOX](https://github.com/Megvii-BaseDetection/YO
 ### 1. Installing on the host machine
 Step1. Install PKF
 ```shell
-git clone https://github.com/hwcao17/deep_pkf_dev.git
+git clone https://github.com/hwcao17/pkf.git
 cd pkf
 pip install -r requirements.txt
 python setup.py develop
