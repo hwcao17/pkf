@@ -8,7 +8,7 @@ git clone https://github.com/hwcao17/deep_pkf_dev.git
 cd pkf
 pip install -r requirements.txt
 python setup.py develop
-cd trackers/pkf_tracker
+cd trackers/pkf_tracker/data_association
 python setup.py install
 ```
 

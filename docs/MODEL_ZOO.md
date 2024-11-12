@@ -1,5 +1,5 @@
 ## Model Zoo
-We provide some pretrained YOLO-X weights for OC-SORT, which are inherited from ByteTrack.
+We provide some pretrained YOLO-X weights for PKF, which are inherited from OC-SORT.
 
 | Dataset         | HOTA | IDF1 | AssA | MOTA | DetA | Model                                                                                                |
 | --------------- | ---- | ---- | ---- | ---- | ---- | ---------------------------------------------------------------------------------------------------- |
