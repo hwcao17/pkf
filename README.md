@@ -32,3 +32,14 @@ or use the shell file [demo_pkf.sh](sh_scripts/demo_pkf.sh).
 <center>
 <img src="assets/demo_out.gif" width="800"/>
 </center>
+
+## Citation
+If you find this work useful, please consider to cite our paper:
+```
+@inproceedings{cao2024pkf,
+  title={PKF: Probabilistic Data Association Kalman Filter for Multi-Object Tracking},
+  author={Cao, Hanwen and Pappas, George J and Atanasov, Nikolay},
+  journal={arXiv preprint arXiv:2411.06378},
+  year={2024}
+}
+```
