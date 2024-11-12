@@ -12,11 +12,9 @@ In the above figure, the green boxes are detections and the orange boxes are tra
 ## Get Started
 * See [INSTALL.md](./docs/INSTALL.md) for instructions of installing required components.
 
-* See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with OC-SORT.
+* See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with PKF.
 
 * See [MODEL_ZOO.md](./docs/MODEL_ZOO.md) for available YOLOX weights.
-
-* See [DEPLOY.md](./docs/DEPLOY.md) for deployment support over ONNX, TensorRT and ncnn.
 
 ## Demo
 To run our PKF tracker on a provided demo video, download it from [google drive](https://drive.google.com/file/d/1lw22C7k7-uWJepnueJeVLwJrOcZ9Y8qg/view?usp=sharing) and put it under the root folder of the code.
