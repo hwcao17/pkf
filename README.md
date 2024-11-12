@@ -1,6 +1,6 @@
 # PKF: Probabilistic Data Association Kalman Filter
 
-**PKF** is a new Kalman filter with probabilistic data association, We derive it by formulating the estimation problem with unknown data association via Expectation-Maximization (EM). We apply it to the multi-object tracking (MOT) task and it can achieve better ID assignment in scenes with high ambiguity compared with other Kalman-filter-based trackers.
+[\[paper\]](https://arxiv.org/pdf/2411.06378) **PKF** is a new Kalman filter with probabilistic data association, We derive it by formulating the estimation problem with unknown data association via Expectation-Maximization (EM). We apply it to the multi-object tracking (MOT) task and it can achieve better ID assignment in scenes with high ambiguity compared with other Kalman-filter-based trackers.
 
 ### Probabilistic data association 
 <center>
