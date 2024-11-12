@@ -1,14 +1,15 @@
 ## Installation
-OC-SORT is built upon codebase of [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) and [ByteTrack](https://github.com/ifzhang/ByteTrack). I tested the code with Python 3.8. 
+PKF is built upon codebase of [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) and [OC-SORT](https://github.com/noahcao/OC_SORT). I tested the code with Python 3.8. 
 
 ### 1. Installing on the host machine
-Step1. Install OC-SORT
+Step1. Install PKF
 ```shell
 git clone https://github.com/hwcao17/deep_pkf_dev.git
-cd deep_pkf_dev
+cd pkf
 pip install -r requirements.txt
 python setup.py develop
 cd trackers/pkf_tracker
+python setup.py install
 ```
 
 Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).

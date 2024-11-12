@@ -1,5 +1,5 @@
 # Get Started 
-We introduce the process of getting started on OC-SORT. This instruction is adapted from ByteTrack especially for the training part. We provide some simple pieces here, for details please refer to the source code and *utils/args.py*.
+We introduce the process of getting started on PKF. This instruction is adapted from ByteTrack especially for the training part. We provide some simple pieces here, for details please refer to the source code and *utils/args.py*.
 
 ## Data preparation
 
@@ -21,7 +21,7 @@ We introduce the process of getting started on OC-SORT. This instruction is adap
 2. Turn the datasets to COCO format and mix different training data:
 
     ```python
-    # replace "dance" with ethz/mot17/mot20/crowdhuman/cityperson for others
+    # replace "dance" with mot17/mot20 for others
     python3 tools/convert_dance_to_coco.py 
     ```
 
@@ -43,7 +43,7 @@ We introduce the process of getting started on OC-SORT. This instruction is adap
         --expn pkf --use_saved_dets \
         --ambig_thresh 0.9 --update_weight_thresh 0.3 --use_ocr --use_ocm
     ```
-    or use the shell script [run_dance_val.sh](../sh_scripts/run_dance_val.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the officially released validation set. This gives HOTA = 53.3. You may use flag `--save_detections` to save detected bounding boxes for future use.
+    or use the shell script [run_dance_val.sh](../sh_scripts/run_dance_val.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the officially released validation set. This gives HOTA = 53.5. You may use flag `--save_detections` to save detected bounding boxes for future use.
 
 * **on DanceTrack Test set**
     ```shell
@@ -62,13 +62,13 @@ We introduce the process of getting started on OC-SORT. This instruction is adap
         -c pretrained/ocsort_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse --expn pkf \
         --update_weight_thresh 0.25 --iou_thresh 0.3 --use_saved_dets
     ```
-    or use the shell script [run_mot17_val.sh](../sh_scripts/run_mot17_val.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the self-splitted validation set. This gives you HOTA = 66.8.
+    or use the shell script [run_mot17_val.sh](../sh_scripts/run_mot17_val.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the self-splitted validation set. This gives you HOTA = 76.9.
 
 * **on MOT17/MOT20 Test set**
     ```shell
     # MOT17
     python tools/run_mot.py -f exps/example/mot/yolox_x_mix_det.py \
-        -c pretrained/bytetrack_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse --test \
+        -c pretrained/ocsort_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse --test \
         --expn pkf --use_saved_dets --update_weight_thresh 0.25
 
     # MOT20
@@ -94,7 +94,7 @@ We introduce the process of getting started on OC-SORT. This instruction is adap
     or use shell scripts [run_mot17_test.sh](../sh_scripts/run_mot17_test.sh) and [run_mot20_test.sh](../sh_scripts/run_mot20_test.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the train set. This gives you HOTA = 74.7 on MOT17 and HOTA = 77.4 on MOT20.
 
 ## [Optional] Interpolation
-OC-SORT is designed for online tracking, but offline interpolation has been demonstrated efficient for many cases. To use the linear interpolation over existing tracking results:
+PKF is designed for online tracking, but offline interpolation has been demonstrated efficient for many cases. To use the linear interpolation over existing tracking results:
 ```shell
     # optional offline post-processing
     python3 tools/interpolation.py $result_path $save_path
@@ -103,4 +103,4 @@ Furthermore, we provide a piece of attempt of using Gaussian Process Regression 
 ```shell
     python3 tools/gp_interpolation.py $raw_results_path $linear_interp_path $save_path
 ```
-*Note: for the results in our paper on MOT17/MOT20 private settings and HeadTrack, we use linear interpolation by default.*
+*Note: for the results in our paper on MOT17/MOT20 private settings, we use linear interpolation by default.*
