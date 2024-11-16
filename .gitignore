@@ -144,10 +144,10 @@ results/
 error_log.txt
 dance_detections/
 
-
 *.mp4
 log_*.txt
 results_log
+JPDAF_comparison/jpdaf_visu
 
 # IDE
 .vs

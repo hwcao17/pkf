@@ -16,6 +16,8 @@ In the above figure, the green boxes are detections and the orange boxes are tra
 
 * See [MODEL_ZOO.md](./docs/MODEL_ZOO.md) for available YOLOX weights.
 
+* See [JPDAF_COMPARISON.md](./docs/JPDAF_COMPARISON.md) for comparison with JPDAF.
+
 ## Demo
 To run our PKF tracker on a provided demo video, download it from [google drive](https://drive.google.com/file/d/1lw22C7k7-uWJepnueJeVLwJrOcZ9Y8qg/view?usp=sharing) and put it under the root folder of the code.
 
