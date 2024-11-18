@@ -30,13 +30,13 @@ If you problem with `pybind11` at this step, you may consider installing `pybind
 pip install "pybind11[global]"
 ```
 
-Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
+Step3. Install [pycocotools](https://github.com/cocodataset/cocoapi).
 
 ```shell
 pip install cython; pip install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 ```
 
-Step3. Others
+Step4. Others
 ```shell
 pip install cython_bbox pandas xmltodict
 ```
