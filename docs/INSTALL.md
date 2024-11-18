@@ -25,7 +25,7 @@ Step2. Install the probabilistic data association
 cd trackers/pkf_tracker/data_association
 python setup.py install
 ```
-If you problem with `pybind11` at this step, you may consider installing `pybind11` using
+If you have problem with `pybind11` at this step, you may consider installing `pybind11` using
 ```shell
 pip install "pybind11[global]"
 ```
