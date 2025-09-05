@@ -84,6 +84,8 @@ class MOTEvaluator:
     def evaluate(self):
         if self.args.jpdaf:
             print('Evaluating JPDAF...')
+        elif self.args.pmht:
+            print('Evaluating PMHT...')
         else:
             print('Evaluating PKF...')
 
@@ -113,7 +115,7 @@ class MOTEvaluator:
         assert gt_trajs.shape[1] == gt_velos.shape[1], 'gt_trajs.shape[1] != gt_velos.shape[1]'
 
         ########## generate measurements ##########
-        if args.n_obj == 10:
+        if args.n_obj >= 10:
             data_fname = os.path.join(self.data_path, 'data_noise_%.2f.pkl' % self.noise_scale)
         else:
             data_fname = os.path.join(self.data_path, 'data.pkl')
@@ -144,6 +146,8 @@ class MOTEvaluator:
             # print('gt_trajs[i, 0, :2, 3]:', gt_trajs[i, 0, :2, 3])
             if self.args.jpdaf and not self.args.binary:
                 pkf.add_tracker_JPDAF(gt_trajs[i, 0, :2, 3])
+            elif self.args.pmht and not self.args.binary:
+                pkf.add_tracker_PMHT(gt_trajs[i, 0, :2, 3])
             else:
                 pkf.add_tracker(gt_trajs[i, 0, :2, 3])    
 
@@ -191,46 +195,49 @@ class MOTEvaluator:
             ################################################
             
             if self.args.binary:
-                tic = time.time()
                 online_targets, update_time = pkf.update(all_measurements[k], None, self.args.binary) 
-                toc = time.time()
-
                 update_times.append(update_time)
+
             else:
-                ############ association stonesoup #############
-                measurements_ss = all_measurements_ss[k]
+                if args.pmht:
+                    online_targets, update_time = pkf.update_PMHT(all_measurements[k])
 
-                hypotheses = data_associator.associate(tracks_ss, measurements_ss, 
-                                                    timestamp=start_time+timedelta(seconds=k))
-                associations_ss = []
-                for i in range(len(tracks_ss)):
-                    track_hypotheses = hypotheses[tracks_ss[i]]
-                    associations_ss_i = {'measurements': [], 'predictions': [], 'probabilities': []}
-                    for h in track_hypotheses:
-                        if h.measurement:
-                            associations_ss_i['measurements'].append(h.measurement.state_vector.reshape(-1))
-                            associations_ss_i['predictions'].append(h.measurement_prediction.state_vector.reshape(-1))
-                            associations_ss_i['probabilities'].append(h.probability)
-                        else:
-                            associations_ss_i['measurements'].append(None)
-                            associations_ss_i['predictions'].append(None)
-                            associations_ss_i['probabilities'].append(h.probability)
-                    associations_ss.append(associations_ss_i)
-
-                if self.args.jpdaf:
-                    tic = time.time()
-                    online_targets = pkf.update_JPDAF(all_measurements[k], associations_ss) 
-                    toc = time.time()
-                    update_times.append(toc - tic)
+                    update_times.append(update_time)
                 else:
-                    tic = time.time()
-                    online_targets, _ = pkf.update(all_measurements[k], associations_ss) 
-                    toc = time.time()
-                    update_times.append(toc - tic)
+                    ############ association stonesoup #############
+                    measurements_ss = all_measurements_ss[k]
+
+                    hypotheses = data_associator.associate(tracks_ss, measurements_ss, 
+                                                        timestamp=start_time+timedelta(seconds=k))
+                    associations_ss = []
+                    for i in range(len(tracks_ss)):
+                        track_hypotheses = hypotheses[tracks_ss[i]]
+                        associations_ss_i = {'measurements': [], 'predictions': [], 'probabilities': []}
+                        for h in track_hypotheses:
+                            if h.measurement:
+                                associations_ss_i['measurements'].append(h.measurement.state_vector.reshape(-1))
+                                associations_ss_i['predictions'].append(h.measurement_prediction.state_vector.reshape(-1))
+                                associations_ss_i['probabilities'].append(h.probability)
+                            else:
+                                associations_ss_i['measurements'].append(None)
+                                associations_ss_i['predictions'].append(None)
+                                associations_ss_i['probabilities'].append(h.probability)
+                        associations_ss.append(associations_ss_i)
+
+                    if self.args.jpdaf:
+                        tic = time.time()
+                        online_targets = pkf.update_JPDAF(all_measurements[k], associations_ss) 
+                        toc = time.time()
+                        update_times.append(toc - tic)
+                    else:
+                        tic = time.time()
+                        online_targets, _ = pkf.update(all_measurements[k], associations_ss) 
+                        toc = time.time()
+                        update_times.append(toc - tic)
 
             results.append(online_targets)
 
-            if not self.args.binary:
+            if not self.args.binary and not self.args.pmht:
                 ######### store the posterior states in stone soup #########
                 if self.args.jpdaf:
                     for i in range(len(pkf.trackers_JPDAF)):
@@ -292,6 +299,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--binary", action="store_true")
     parser.add_argument("--jpdaf", action="store_true")
+    parser.add_argument("--pmht", action="store_true")
     parser.add_argument("--noise_scale", type=float, default=0.75)
     args = parser.parse_args()
 

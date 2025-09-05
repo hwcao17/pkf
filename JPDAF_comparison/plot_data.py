@@ -59,18 +59,18 @@ if __name__ == "__main__":
         plt.plot(gt_trajs[i, :, 0], gt_trajs[i, :, 1], '--', c=obj_colors[i], linewidth=6, \
                  label='Object-%d' % i)
 
+    # plot clutters
+    plt.scatter(clutters[:, 0], clutters[:, 1], s=160, c=[[0.9, 0.9, 0]], \
+                marker='x', linewidth=4, label='Clutter')
+    
     # plot measurements
     plt.scatter(measurements[:, 0], measurements[:, 1], s=128, c='g', marker='o', \
                     label='Measurement')
 
-    # plot clutters
-    plt.scatter(clutters[:, 0], clutters[:, 1], s=128, c=[[0.9, 0.9, 0]], \
-                marker='x', label='Clutter')
-
-    plt.legend(fontsize=20)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.xlabel('X', fontsize=20)
-    plt.ylabel('Y', fontsize=20)
+    plt.legend(fontsize=25)
+    plt.xticks(fontsize=35)
+    plt.yticks(fontsize=35)
+    plt.xlabel('X', fontsize=35)
+    plt.ylabel('Y', fontsize=35)
     # plt.savefig('jpdaf_data.png')
     plt.show()

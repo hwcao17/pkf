@@ -160,7 +160,8 @@ ASSO_FUNCS = {  "iou": iou_batch,
 class PKFTracker(object):
     def __init__(self, det_thresh, max_age=30, min_hits=3, 
         iou_threshold=0.3, delta_t=3, asso_func="iou", inertia=0.2, 
-        use_ocr=False, use_ocm=False, ambig_thresh=0.9, update_weight_thresh=0.3):
+        use_ocr=False, use_ocm=False, ambig_thresh=0.9, update_weight_thresh=0.3, 
+        score_thre=-1, skip_thre=0.95, coef=2.0):
         """
         Sets key parameters for PKFTracker
         """
@@ -178,6 +179,9 @@ class PKFTracker(object):
         # print('use ocr:', use_ocr, 'use ocm:', use_ocm)
         self.ambig_thresh = ambig_thresh
         self.update_weight_thresh = update_weight_thresh
+        self.score_thre = score_thre
+        self.skip_thre = skip_thre
+        self.coef = coef
 
         PAKalmanBoxTracker.count = 0
 
@@ -242,7 +246,8 @@ class PKFTracker(object):
         weight_thre = self.update_weight_thresh
         matched_dets, matched_trks, weights, unmatched_dets, unmatched_trks = associate(
             dets_first, trks, self.iou_threshold, velocities, k_observations, self.inertia, 
-            self.ambig_thresh, self.use_ocm, self.use_ocr, binary, weight_thre, img_info)
+            self.ambig_thresh, self.use_ocm, self.use_ocr, binary, weight_thre, 
+            self.score_thre, self.skip_thre, self.coef)
         
         ######### save the matches and weights for visualizations #########
         # frame_id, video_id = img_info[2].item(), img_info[3].item()

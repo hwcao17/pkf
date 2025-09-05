@@ -6,8 +6,9 @@ if [ $# -eq 0 ]; then
         -c pretrained/ocsort_dance_model.pth.tar \
         --detection_dir YOLOX_outputs/dancetrack/detections \
         --output_dir YOLOX_outputs/dancetrack \
-        -b 1 -d 1 --fp16 --fuse --ambig_thresh 0.9 --update_weight_thresh 0.3 \
-        --expn pkf --test --use_saved_dets --use_ocm --use_ocr
+        -b 1 -d 1 --fp16 --fuse --ambig_thresh 0.9 --update_weight_thresh 0.25 \
+        --score_thresh 0.8 --skip_thresh 0.9 --use_ocr --coef 1.0 \
+        --expn pkf --test --use_saved_dets
     exit 1
 fi
 

@@ -1,6 +1,6 @@
 
 import numpy as np
-import papy
+from numpy.linalg import inv, det
 
 
 def associate_binary(detections, trackers):
@@ -64,6 +64,10 @@ def binary_assignment(dist_matrix):
 
     return matched_dets, matched_trks, weights, unmatched_detections, unmatched_trackers
 
+
+def compute_norm_prob(z, y, R):
+    # print('z:', z.shape, 'y:', y.shape, 'R:', R.shape)
+    return 1/(2*np.pi*(det(R)**0.5))*np.exp(np.array(-0.5*(z-y).T @ inv(R)@(z-y))[0][0])
 
 if __name__ == "__main__":
     print("Data association module.")

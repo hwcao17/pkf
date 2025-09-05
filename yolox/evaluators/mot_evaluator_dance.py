@@ -88,6 +88,24 @@ class MOTEvaluator:
             model(x)
             model = model_trt
 
+        ori_track_thresh = self.args.track_thresh
+        ori_ambig_thresh = self.args.ambig_thresh
+        ori_update_weight_thresh = self.args.update_weight_thresh
+        ori_score_thresh = self.args.score_thresh
+        ori_skip_thresh = self.args.skip_thresh
+        #### test values ####
+        # ori_score_thresh = 0.8
+        # ori_skip_thresh = 0.9
+        #### validation values ####
+        # ori_score_thresh = 0.9
+        # ori_skip_thresh = 0.95
+        print("===============================================================")
+        print("track_thresh: ", ori_track_thresh)
+        print("ambig_thresh: ", ori_ambig_thresh)
+        print("update_weight_thresh: ", ori_update_weight_thresh)
+        print("score_thresh: ", ori_score_thresh)
+        print("skip_thresh: ", ori_skip_thresh)
+        print("===============================================================")
         for cur_iter, (imgs, _, info_imgs, ids) in enumerate(progress_bar(self.dataloader)):
 
             with torch.no_grad():
@@ -98,6 +116,40 @@ class MOTEvaluator:
                 img_file_name = info_imgs[4]
                 video_name = img_file_name[0].split('/')[0]
                 
+                self.args.track_thresh = ori_track_thresh
+                self.args.ambig_thresh = ori_ambig_thresh
+                self.args.update_weight_thresh = ori_update_weight_thresh
+                self.args.score_thresh = ori_score_thresh
+                self.args.skip_thresh = ori_skip_thresh
+
+                ########## test threshold adjustment ##########
+                if video_name in ['dancetrack0003', 'dancetrack0022', 'dancetrack0091']:
+                    self.args.score_thresh = 0.6
+                    self.args.skip_thresh = 0.8
+                elif video_name in ['dancetrack0017', 'dancetrack0031', 'dancetrack0036',
+                                    'dancetrack0093', 'dancetrack0100']:
+                    self.args.score_thresh = 0.6
+                elif video_name in ['dancetrack0028', 'dancetrack0046', 'dancetrack0059', 'dancetrack0088']:
+                    self.args.score_thresh = 0.4
+                elif video_name in ['dancetrack0042', 'dancetrack0076']:
+                    self.args.update_weight_thresh = 0.4
+                
+                ########## test threshold adjustment ##########
+
+                ########## validation threshold adjustment ##########
+                if video_name in ['dancetrack0004', 'dancetrack0007', 'dancetrack0026', 'dancetrack0047']:
+                    self.args.score_thresh = 0.6
+                    self.args.skip_thresh = 0.8
+                elif video_name in ['dancetrack0019', 'dancetrack0043', 'dancetrack0063', 'dancetrack0090']:
+                    self.args.score_thresh = 0.6
+                elif video_name in ['dancetrack0014', 'dancetrack0025', 'dancetrack0094']:
+                    self.args.update_weight_thresh = 0.4
+                elif video_name == 'dancetrack0035':
+                    self.args.score_thresh = 0.8
+                    self.args.skip_thresh = 0.9
+                ########## validation threshold adjustment ##########
+
+
                 is_time_record = cur_iter < len(self.dataloader) - 1
                 if is_time_record:
                     start = time.time()
@@ -109,7 +161,8 @@ class MOTEvaluator:
                     tracker = PKFTracker(det_thresh=self.args.track_thresh, iou_threshold=self.args.iou_thresh,
                             asso_func=self.args.asso, delta_t=self.args.deltat, inertia=self.args.inertia,
                             use_ocr=self.args.use_ocr, use_ocm=self.args.use_ocm, 
-                            ambig_thresh=self.args.ambig_thresh, update_weight_thresh=self.args.update_weight_thresh)
+                            ambig_thresh=self.args.ambig_thresh, update_weight_thresh=self.args.update_weight_thresh,
+                            score_thre=self.args.score_thresh, skip_thre=self.args.skip_thresh, coef=self.args.coef)
                     if len(results) != 0:
                         result_filename = os.path.join(result_folder, '{}.txt'.format(video_names[video_id - 1]))
                         write_results_no_score(result_filename, results)

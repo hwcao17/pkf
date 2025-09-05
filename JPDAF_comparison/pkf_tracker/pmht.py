@@ -1,8 +1,7 @@
 import numpy as np
-from copy import deepcopy
 
 
-class PAKalmanFilter(object):
+class PMHT(object):
 
     def __init__(self, dim_x, dim_z, dim_u=0):
         if dim_x < 1:
@@ -26,14 +25,13 @@ class PAKalmanFilter(object):
         self.H = np.zeros((dim_z, dim_x))    # measurement matrix
         self.V = np.eye(dim_z)               # measurement uncertainty
 
-        self.history_obs = []
+        # self.history_obs = []
         self.observed = False
         self.freezed = False
         self.attr_saved = None
 
         self.inv = np.linalg.inv
 
-    
     def predict(self, u=None, G=None, F=None, W=None):
         if G is None:
             G = self.G
@@ -49,55 +47,30 @@ class PAKalmanFilter(object):
             self.x = F @ self.x + G @ u
         else:
             self.x = F @ self.x
-
+        
         # P = FPF' + W
         self.P = F @ self.P @ F.T + W
-
-
-
+    
     def update(self, z, w, V=None, H=None):
-        
-        if z is None:
-            self.history_obs.append(None)
+        if z is None:    
             return
-        
-        dominant_idx = np.argmax(w)
-        dominant_z = z[dominant_idx]
-        
-        # append the observation
-        self.history_obs.append(dominant_z)
         # z: list of measurements; w: list of weights
         assert len(z) == len(w), 'z and w must have the same length'
 
-        m = len(z) # number of measurements
-        z_exp = np.array(z).reshape(-1, 1)
+        # m = len(z) # number of measurements
 
-        # create expanded R matrices
+        z_tilde = np.sum(z * w[:, None], axis=0)
+        z_tilde /= np.sum(w) + 1e-16  # avoid division by zero
+        z_tilde = z_tilde.reshape(-1, 1)
+
         if V is None:
-            V_exp = np.kron(np.eye(m), self.V)
-            
-        elif np.isscalar(V):
-            V_exp = np.kron(np.eye(m), np.eye(self.dim_z) * V)
-
-        for i in range(m):
-            V_exp[i*self.dim_z:(i+1)*self.dim_z, i*self.dim_z:(i+1)*self.dim_z] = self.V / w[i]
+            V = self.V / (np.sum(w) + 1e-16)  # avoid division by zero
         
-        if np.linalg.det(V_exp) == 0:
-            print('singular V_exp\n', 'w:\n', w)
-
-        # create expanded C matrices
         if H is None:
-            H_exp = np.kron(np.ones((m, 1)), self.H)
-        else:
-            H_exp = np.kron(np.ones((m, 1)), H)
+            H = self.H
         
-        # Kalman gain
-        K = self.P @ H_exp.T @ self.inv(H_exp @ self.P @ H_exp.T + V_exp)
+        K = self.P @ H.T @ self.inv(H @ self.P @ H.T + V)
 
-        # measurement residual
-        y = z_exp - H_exp @ self.x
-
-        # update
-        self.x = self.x + K @ y
-        self.P = (np.eye(self.dim_x) - K @ H_exp) @ self.P
+        self.x = self.x + K @ (z_tilde - H @ self.x)
+        self.P = self.P - K @ H @ self.P
 

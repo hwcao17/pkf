@@ -27,6 +27,13 @@ python run_mot_sim.py --n_obj 5 --jpdaf
 ```
 You may specify `--noise_scale` for experiments with 10 objects.
 
+To run PMHT with 5 objects
+```shell
+cd JPDAF_comparison
+python run_mot_sim.py --n_obj 5 --pmht
+```
+You may specify `--noise_scale` for experiments with 10 objects.
+
 Note that, we compute the data association weights with [StoneSoup library](https://stonesoup.readthedocs.io/en/stable/auto_tutorials/index.html) but the update step of JPDAF is implemented by ourselves. We also provide an update implementation with [StoneSoup library](https://stonesoup.readthedocs.io/en/stable/auto_tutorials/index.html) in [jpdaf_stonsoup.py](../JPDAF_comparison/jpdaf_stonesoup.py) which gives us similar tracking errors but much slower tracking rates. To run that script
 
 ```shell

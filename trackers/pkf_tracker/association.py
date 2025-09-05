@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import papy
+from scipy.stats import chi2
 
 
 def convert_bbox_to_z(bbox):
@@ -206,7 +207,8 @@ def linear_assignment(cost_matrix):
         x, y = linear_sum_assignment(cost_matrix)
         return np.array(list(zip(x, y)))
 
-def ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thre=0.9, use_ocr=False):
+def ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thre=0.9, use_ocr=False,
+                score_thre=1, skip_thre=0.95):
     '''
         Get the ambiguous detections and trackers as described in the paper
     '''
@@ -239,7 +241,6 @@ def ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thre=0.9, u
     unmatched_trks2del = []
     
     if use_ocr:
-        score_thre = 0.6
         for t in unmatched_trackers:
             scores_trk = score_matrix[:, t]
 
@@ -256,7 +257,8 @@ def ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thre=0.9, u
     for i in range(len(matches_bin)):
         d, t = matches_bin[i, :]
 
-        if score_matrix[d, t] > 0.95 and not use_ocr:
+        # if score_matrix[d, t] > 0.95 and not use_ocr:
+        if score_matrix[d, t] > skip_thre:
             continue
 
         if t in ambig_trks:
@@ -272,17 +274,19 @@ def ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thre=0.9, u
     
     return ambig_dets, ambig_trks, unmatched_trks2del
 
-def prob_matrix_v0(score_matrix, ambig_dets, ambig_trks):
+def prob_matrix_v0(score_matrix, ambig_dets, ambig_trks, coef=2.0):
     ambig_score_matrix = score_matrix[ambig_dets, :][:, ambig_trks]
     cost_matrix = 1. / (ambig_score_matrix + 1e-16)
-    ambig_prob_matrix = np.exp(-2 * cost_matrix)
+    # print("=============== coef: ", coef)
+    ambig_prob_matrix = np.exp(-coef * cost_matrix)
     ambig_prob_matrix = ambig_prob_matrix / ambig_prob_matrix.sum(axis=1, keepdims=True)
 
     return ambig_prob_matrix
 
 
 def prob_assignment(iou_matrix, score_matrix, iou_thresh=0.1, 
-                    ambig_thresh = 0.9, use_ocr=False, binary=False, weight_thre=0.3):
+                    ambig_thresh = 0.9, use_ocr=False, binary=False, weight_thre=0.3,
+                    score_thre=0.8, skip_thre=0.9, coef=2.0):
     
     if min(iou_matrix.shape) > 0:
         a = (iou_matrix > iou_thresh).astype(int)
@@ -326,13 +330,14 @@ def prob_assignment(iou_matrix, score_matrix, iou_thresh=0.1,
     
     if not binary:
         ambig_dets, ambig_trks, unmatched_trks2del = \
-            ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thresh, use_ocr)
+            ambig_check(score_matrix, matches_bin, unmatched_trackers, ambig_thresh, use_ocr,
+                        score_thre, skip_thre)
         
         for t in unmatched_trks2del:
             unmatched_trackers.remove(t)
 
         ############## construct the probability matrix with the score (IoU) matrix ##############
-        ambig_prob_matrix = prob_matrix_v0(score_matrix, ambig_dets, ambig_trks)
+        ambig_prob_matrix = prob_matrix_v0(score_matrix, ambig_dets, ambig_trks, coef)
         
         ambig_weights = papy.compute_weights(ambig_prob_matrix)
         
@@ -360,7 +365,8 @@ def prob_assignment(iou_matrix, score_matrix, iou_thresh=0.1,
 
 
 def associate(detections, trackers, iou_threshold, velocities, previous_obs, vdc_weight, 
-              ambig_thresh, use_ocm, use_ocr, binary=False, weight_thre=0.3, img_info=None):
+              ambig_thresh, use_ocm, use_ocr, binary=False, weight_thre=0.3, 
+              score_thre=0.8, skip_thre=0.9, coef=2.0):
     if(len(trackers)==0):
         return np.empty((0),dtype=int), np.empty((0),dtype=int), \
             np.empty((0, 0),dtype=float), np.arange(len(detections)), np.empty((0),dtype=int)
@@ -393,8 +399,8 @@ def associate(detections, trackers, iou_threshold, velocities, previous_obs, vdc
     
     matched_dets, matched_trks, weights, unmatched_dets, unmatched_trks = \
         prob_assignment(iou_matrix, score_matrix, iou_threshold, 
-                        ambig_thresh, use_ocr, binary, weight_thre)
-    
+                        ambig_thresh, use_ocr, binary, weight_thre, score_thre, skip_thre, coef)
+
     return matched_dets, matched_trks, weights, unmatched_dets, unmatched_trks
 
 

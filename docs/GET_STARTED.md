@@ -40,8 +40,9 @@ We introduce the process of getting started on PKF. This instruction is adapted 
         -c pretrained/ocsort_dance_model.pth.tar \
         --detection_dir YOLOX_outputs/dancetrack/detections \
         --output_dir YOLOX_outputs/dancetrack -b 1 -d 1 --fp16 --fuse \
-        --expn pkf --use_saved_dets \
-        --ambig_thresh 0.9 --update_weight_thresh 0.3 --use_ocr --use_ocm
+        --ambig_thresh 0.9 --update_weight_thresh 0.25 \
+        --score_thresh 0.9 --skip_thresh 0.95 --use_ocr --coef 1.0 \
+        --expn pkf --use_saved_dets
     ```
     or use the shell script [run_dance_val.sh](../sh_scripts/run_dance_val.sh). We follow the [TrackEval protocol](https://github.com/DanceTrack/DanceTrack/tree/main/TrackEval) for evaluation on the officially released validation set. This gives HOTA = 53.5. You may use flag `--save_detections` to save detected bounding boxes for future use.
 
@@ -51,8 +52,9 @@ We introduce the process of getting started on PKF. This instruction is adapted 
         -c pretrained/ocsort_dance_model.pth.tar \
         --detection_dir YOLOX_outputs/dancetrack/detections \
         --output_dir YOLOX_outputs/dancetrack \
-        -b 1 -d 1 --fp16 --fuse --ambig_thresh 0.9 --update_weight_thresh 0.3 \
-        --expn pkf --test --use_saved_dets --use_ocm --use_ocr
+        -b 1 -d 1 --fp16 --fuse --ambig_thresh 0.9 --update_weight_thresh 0.25 \
+        --score_thresh 0.8 --skip_thresh 0.9 --use_ocr --coef 1.0 \
+        --expn pkf --test --use_saved_dets
     ```
     or use the shell script [run_dance_test.sh](../sh_scripts/run_dance_test.sh). Submit the outputs to [the DanceTrack evaluation site](https://competitions.codalab.org/competitions/35786). This gives HOTA = 55.4.
 
